@@ -41,3 +41,11 @@ Alternatively, you can use the [dokku-letsencrypt](https://github.com/dokku/dokk
 ### Github
 
 An SSH key with access to your Droplet will need to be added to Repository Secrets as `SSH_PRIVATE_KEY`
+
+### Notes
+
+This workflow builds your image on your Droplet which may fail on complicated, resource intensive builds.
+
+See [Deploy a dokku App With a Remote Docker Image](https://richardwillis.info/blog/deploy-dokku-app-remote-docker-image) for an alternate approach deploying locally built images.
+
+[https://github.com/anselbrandt/test-app-local-build](https://github.com/anselbrandt/test-app-local-build)
