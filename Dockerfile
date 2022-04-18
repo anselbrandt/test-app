@@ -1,9 +1,16 @@
-FROM node:16
-WORKDIR /usr/src/app
+FROM node:16 AS dependencies
+WORKDIR /app
 COPY package*.json ./
 RUN npm install
+
+FROM dependencies AS builder
 COPY . .
+RUN npm run build
 
-EXPOSE 3000
+FROM nginx
+COPY --from=builder /app/build /usr/share/nginx/html
+COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-CMD [ "npm", "start" ]
+EXPOSE 8080
+
+CMD ["nginx", "-g", "daemon off;"]
