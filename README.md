@@ -1,46 +1,41 @@
-# Getting Started with Create React App
+# Dokku Test-App Deploying to Digitalocean
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+On `git push` a Github Action will be triggered to deploy this application to an existing Digitalocean Droplet.
 
-## Available Scripts
+Domain, proxying and SSL certificates should already be set up, and the application must be created.
 
-In the project directory, you can run:
+This application deploys to the root domain.
 
-### `yarn start`
+```
+dokku apps:create <app-name>
+dokku domains:clear-global
+dokku domains:set <app-name> <domain>
+dokku proxy:ports-set <app-name> http:80:<port-exposed-by-docker-container>
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### SSL Certs
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+If adding an existing cert/key pair, they must be named `server.crt` and `server.key` and put in a `.tar` file named `cert-key.tar` then uploaded to your Droplet.
 
-### `yarn test`
+```
+tar cvf cert-key.tar server.crt server.key
+scp cert-key.tar root@<domain.tld>:/root
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+In your Droplet:
 
-### `yarn build`
+```
+dokku certs:add <app-name> < cert-key.tar
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Alternatively, you can use the [dokku-letsencrypt](https://github.com/dokku/dokku-letsencrypt) pluggin.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+\*letsencrypt will rate limit to 5 API calls per 7 day period.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Config
 
-### `yarn eject`
+`.github/workflows/dokku.yml` must point to the correct branch (eg. master or main), `dokku-host` (domain), and `app-name`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Github
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+An SSH key with access to your Droplet will need to be added to Repository Secrets as `SSH_PRIVATE_KEY`
