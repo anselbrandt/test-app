@@ -1,5 +1,7 @@
 # Dokku Test-App Deploying to Digitalocean
 
+This repo uses the [dokku-deploy-action](https://github.com/marketplace/actions/dokku-deploy-action) workflow.
+
 On `git push` a Github Action will be triggered to deploy this application to an existing Digitalocean Droplet.
 
 Domain, proxying and SSL certificates should already be set up, and the application must be created.
